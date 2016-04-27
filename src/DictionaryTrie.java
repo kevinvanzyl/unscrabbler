@@ -107,29 +107,110 @@ public class DictionaryTrie {
 		}
 	}
 	
+	private char[] reverseCharArr(char[] charArr) {
+		char[] newCharArr = new char[charArr.length];
+		int cnt = 0;
+		for (int i = charArr.length - 1; i >= 0; i--) {
+			newCharArr[cnt] = charArr[i];
+			cnt++;
+		}
+
+		return newCharArr;
+	}
+	
 	/**
 	 * Get the paths that need to be searched which will provide us with all combinations of words
 	 * @return The paths that need to be searched in order to get all combinations of letters given
 	 * @param  chararray the word sorted alphabetically and broken into a char array
 	 * */
 	public String[] findPaths(char[] chararr){
+
 		String[] store = new String[(int)Math.pow(2, chararr.length-1)];
 		store = arrJoin(new String[]{String.valueOf(chararr[chararr.length-1])}, findPath(new String[]{String.valueOf(chararr[chararr.length-1])}, chararr));
 
 		return store;
 	}
+
+	public int countCharOccurrences(String word, char c) {
+		int count = 0;
+		for (char w: word.toCharArray()) {
+			if (w == c) {
+				count++;
+			}
+		}
+
+
+		return count;
+	}
+
+	public String concatStringArr(String[] strArr) {
+		String concat = "[";
+		for (String s: strArr) {
+			concat += (s+"],[");
+		}
+
+		return concat;
+	}
+
+	private boolean unique(String needle, String[] haystack) {
+		if (haystack == null || needle == null) {
+			return true;
+		}
+
+		for (String hay: haystack) {
+			if (hay == null) {
+				return true;
+			}
+			if (hay.equals(needle)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	
 	public String[] findPath(String[] store, char[] arr){
-		String[] temp = new String[500];
+		String[] temp = new String[11*10*9*8*7*6*5];
 		int count = 0;
-		for (String item: store)
-			if (item != null)
-				for (char i: arr)
-					if (item.charAt(0) > i)
-					{
-						temp[count] = String.valueOf(i) + item;
-						count++;
+
+		String alpha = String.valueOf(arr);
+		System.out.println("***************** findPath(\n\t store: "+concatStringArr(store)+",\n\t alpha: "+alpha);
+
+		for (String item: store) {
+
+			System.out.println("item = "+item);
+
+			if (item != null) {
+
+				System.out.println("for (char i: arr) {");
+				for (char i: arr) {
+
+					if (i < item.charAt(0)) {	
+						if (unique(String.valueOf(i) + item, temp)) {
+							System.out.println("\t i: "+i+" is \t<\t item.charAt(0): "+item.charAt(0));
+							temp[count] = String.valueOf(i) + item;
+							System.out.println("\t temp["+count+"] = "+temp[count]);
+							count++;
+						}
 					}
+					else if (item.charAt(0) == i) {
+						System.out.println("\t i: "+i+" is \t=\t item.charAt(0): "+item.charAt(0));
+						System.out.println("\t countCharOccurrences("+item+", "+i+")  = "+countCharOccurrences(item, i));
+						System.out.println("\t countCharOccurrences("+alpha+", "+i+") = "+countCharOccurrences(alpha, i));
+						if (countCharOccurrences(item, i) < countCharOccurrences(alpha, i)) {
+							if (unique(String.valueOf(i) + item, temp)) {
+								temp[count] = String.valueOf(i) + item;
+								System.out.println("\t special case: "+temp[count]);
+								count++;
+							}
+						}
+						
+					}
+				}
+				System.out.println("}");
+			}
+		}
+
 		if (temp[0] != null)
 		{
 			int i = 0;
